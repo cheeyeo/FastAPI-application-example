@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres
+    env_file: .env
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: ${RDS_USERNAME}
+      POSTGRES_DB: ${RDS_DB_NAME}
+      POSTGRES_PASSWORD: ${RDS_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${RDS_USERNAME} -d ${RDS_DB_NAME}"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - pgdata2:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 8080:8080
+
+volumes:
+  pgdata2:
