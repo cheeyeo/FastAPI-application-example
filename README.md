@@ -5,10 +5,14 @@ Ref:
 https://realpython.com/fastapi-python-web-apis/
 
 Using databases with fastapi:
-https://fastapi.tiangolo.com/tutorial/sql-database
+https://fastapi.tiangolo.com/tutorial/sql-databases
 
 Full app with database:
 https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
+
+
+https://sqlmodel.tiangolo.com/tutorial/fastapi/multiple-models/#the-heropublic-data-model
+
 
 
 ### ON using alembic to generate migrations
