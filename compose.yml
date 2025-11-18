@@ -42,6 +42,23 @@ services:
     environment:
       RDS_HOSTNAME: db
     restart: always
+    develop:
+      watch:
+        - action: rebuild
+          path: ./app
+          target: /app
+          ignore:
+            - __pycache__
+            - .venv/
+        - action: rebuild
+          path: uv.lock
+        - action: rebuild
+          path: pyproject.toml
+        - action: rebuild
+          path: alembic/versions
+          ignore:
+            - __pycache__
+      
     ports:
       - 8000:8000
 

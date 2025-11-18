@@ -45,3 +45,12 @@ class RandomItemCreate(RandomItemBase):
         if self.min_value > self.max_value:
             raise ValueError("min value can't be greater than max value")
         return self
+    
+
+class RandomItemUpdate(RandomItemBase):
+    @model_validator(mode='after')
+    def check_values(self) -> Self:
+        if self.min_value > self.max_value:
+            raise ValueError("min value can't be greater than max value")
+        return self
+    
