@@ -1,12 +1,10 @@
 import os
-import random
-from typing import Annotated
-from typing_extensions import Self
+from typing import Annotated, Self
+
 from dotenv import load_dotenv
 from fastapi import Depends
 from pydantic import model_validator
-from sqlmodel import Field, Session, SQLModel, create_engine, select
-
+from sqlmodel import Field, Session, SQLModel, create_engine
 
 load_dotenv()
 
@@ -40,17 +38,16 @@ class RandomItemPublic(RandomItemBase):
 
 
 class RandomItemCreate(RandomItemBase):
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def check_values(self) -> Self:
         if self.min_value > self.max_value:
             raise ValueError("min value can't be greater than max value")
         return self
-    
+
 
 class RandomItemUpdate(RandomItemBase):
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def check_values(self) -> Self:
         if self.min_value > self.max_value:
             raise ValueError("min value can't be greater than max value")
         return self
-    

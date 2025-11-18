@@ -27,12 +27,19 @@ https://sqlmodel.tiangolo.com/tutorial/fastapi/multiple-models/#the-heropublic-d
 * Run `alembic upgrade head` to run migrations
 
 
-
 #### RUN LOCALY
 
 ```
 docker compose -f compose.yml up
+```
 
-( in separate terminal )
-uv run fastapi run --reload main.py
+#### Installing ruff
+
+Ref:
+https://docs.astral.sh/ruff/tutorial/#rule-selection
+
+```
+uv add --dev ruff
+
+
 ```
