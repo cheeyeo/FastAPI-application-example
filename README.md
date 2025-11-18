@@ -41,5 +41,7 @@ https://docs.astral.sh/ruff/tutorial/#rule-selection
 ```
 uv add --dev ruff
 
+uv run ruff check --fix app/
 
+uv run ruff format app/
 ```
