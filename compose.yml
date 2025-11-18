@@ -27,5 +27,23 @@ services:
     ports:
       - 8080:8080
 
+  
+  fastapiapp:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: fastapiapp:latest
+    container_name: fastapiapp
+    depends_on:
+      db:
+        condition: service_started
+        restart: true
+    env_file: .env
+    environment:
+      RDS_HOSTNAME: db
+    restart: always
+    ports:
+      - 8000:8000
+
 volumes:
   pgdata2:

@@ -3,12 +3,14 @@ from typing import Annotated, Any
 import logging
 from fastapi import FastAPI, HTTPException, Query, Depends
 from sqlmodel import Session, select
-from models import SessionDep, engine, RandomItem, RandomItemCreate, RandomItemPublic
+from app.models import SessionDep, engine, RandomItem, RandomItemCreate, RandomItemPublic
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 app = FastAPI()
-logger = logging.getLogger(__name__)
-
 
 @app.get("/")
 def home():
@@ -16,7 +18,7 @@ def home():
 
 
 #### Testing DB
-print("Initialize database...")
+logger.info("Initialize database...")
 try:
     with Session(engine) as session:
         session.exec(select(1))
@@ -32,4 +34,5 @@ def create_random(item: RandomItemCreate, session: SessionDep):
     session.add(new_item)
     session.commit()
     session.refresh(new_item)
+    logger.info("Created new random...")
     return new_item

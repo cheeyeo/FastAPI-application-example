@@ -2,12 +2,16 @@ import os
 import random
 from typing import Annotated
 from typing_extensions import Self
+from dotenv import load_dotenv
 from fastapi import Depends
 from pydantic import model_validator
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 
+load_dotenv()
+
 postgresql_url = f"postgresql://{os.environ.get('RDS_USERNAME')}:{os.environ.get('RDS_PASSWORD')}@{os.environ.get('RDS_HOSTNAME')}:{os.environ.get('RDS_PORT')}/{os.environ.get('RDS_DB_NAME')}"
+
 
 engine = create_engine(postgresql_url, connect_args={})
 
