@@ -1,17 +1,19 @@
 ### FastAPI project
 
-Ref:
+### Ref
 
 https://realpython.com/fastapi-python-web-apis/
 
-Using databases with fastapi:
-https://fastapi.tiangolo.com/tutorial/sql-databases
 
 Full app with database:
 https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
 
 
-https://sqlmodel.tiangolo.com/tutorial/fastapi/multiple-models/#the-heropublic-data-model
+### TUTORIAL
+- [ ] https://sqlmodel.tiangolo.com/tutorial/fastapi/
+- [x] https://fastapi.tiangolo.com/tutorial/sql-databases/
+- [ ] https://fastapi.tiangolo.com/tutorial/bigger-applications/#an-example-file-structure
+
 
 
 
@@ -28,6 +30,16 @@ https://sqlmodel.tiangolo.com/tutorial/fastapi/multiple-models/#the-heropublic-d
 
 
 #### RUN LOCALY
+
+Create .env file with following values:
+```
+export RDS_USERNAME="xxx"
+export RDS_DB_NAME="xxx"
+export RDS_PASSWORD="xxx"
+export RDS_HOSTNAME="localhost"
+export RDS_PORT=5432
+export ENV_TYPE="dev"
+```
 
 ```
 docker compose -f compose.yml up
