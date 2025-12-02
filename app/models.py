@@ -19,9 +19,6 @@ def get_session():
         yield session
 
 
-SessionDep = Annotated[Session, Depends(get_session)]
-
-
 class RandomItemBase(SQLModel):
     min_value: int
     max_value: int

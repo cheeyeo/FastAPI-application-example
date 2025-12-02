@@ -10,9 +10,10 @@ https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
 
 
 ### TUTORIAL
+- [ ] https://fastapi.tiangolo.com/tutorial/security/first-steps/
 - [ ] https://sqlmodel.tiangolo.com/tutorial/fastapi/
 - [x] https://fastapi.tiangolo.com/tutorial/sql-databases/
-- [ ] https://fastapi.tiangolo.com/tutorial/bigger-applications/#an-example-file-structure
+- [x] https://fastapi.tiangolo.com/tutorial/bigger-applications/#an-example-file-structure
 
 
 

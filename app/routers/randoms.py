@@ -2,8 +2,8 @@ from typing import Annotated
 import random
 from fastapi import APIRouter, Query, HTTPException
 from sqlmodel import select
-from app.models import SessionDep, RandomItem, RandomItemPublic, RandomItemCreate, RandomItemUpdate
-from app.dependencies import logger
+from app.models import RandomItem, RandomItemPublic, RandomItemCreate, RandomItemUpdate
+from app.dependencies import logger, SessionDep, TokenDep
 
 
 router = APIRouter()
@@ -11,7 +11,7 @@ router = APIRouter()
 
 @router.get("/randoms/", response_model=list[RandomItemPublic], tags=["Random Items Management"])
 async def read_randoms(
-    session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100
+    session: SessionDep, token: TokenDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100
 ):
     randoms = session.exec(select(RandomItem).offset(offset).limit(limit)).all()
     return randoms

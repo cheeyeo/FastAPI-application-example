@@ -49,7 +49,6 @@ services:
           target: /app
           ignore:
             - __pycache__
-            - .venv/
         - action: rebuild
           path: uv.lock
         - action: rebuild
