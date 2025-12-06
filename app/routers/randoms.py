@@ -1,24 +1,32 @@
-from typing import Annotated
 import random
-from fastapi import APIRouter, Query, HTTPException
-from sqlmodel import select
-from app.models import RandomItem, RandomItemPublic, RandomItemCreate, RandomItemUpdate
-from app.dependencies import logger, SessionDep, TokenDep
+from typing import Annotated
 
+from fastapi import APIRouter, HTTPException, Query
+from sqlmodel import select
+
+from app.dependencies import CurrentUser, SessionDep, logger
+from app.models import RandomItem, RandomItemCreate, RandomItemPublic, RandomItemUpdate
 
 router = APIRouter()
 
 
-@router.get("/randoms/", response_model=list[RandomItemPublic], tags=["Random Items Management"])
+@router.get(
+    "/randoms/", response_model=list[RandomItemPublic], tags=["Random Items Management"]
+)
 async def read_randoms(
-    session: SessionDep, token: TokenDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100
+    session: SessionDep,
+    user: CurrentUser,
+    offset: int = 0,
+    limit: Annotated[int, Query(le=100)] = 100,
 ):
     randoms = session.exec(select(RandomItem).offset(offset).limit(limit)).all()
     return randoms
 
 
 @router.get(
-    "/randoms/{random_id}", response_model=RandomItemPublic, tags=["Random Items Management"]
+    "/randoms/{random_id}",
+    response_model=RandomItemPublic,
+    tags=["Random Items Management"],
 )
 async def read_random(random_id: int, session: SessionDep):
     random_db = session.get(RandomItem, random_id)

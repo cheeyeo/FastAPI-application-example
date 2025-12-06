@@ -58,3 +58,5 @@ uv run ruff check --fix app/
 
 uv run ruff format app/
 ```
+
+https://github.com/astral-sh/uv-docker-example/blob/main/Dockerfile

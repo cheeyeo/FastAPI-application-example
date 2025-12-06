@@ -1,13 +1,10 @@
-import logging
-import random
-from typing import Annotated
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, select
-from app.models import engine
-from app.dependencies import logger
-from app.routers import randoms
 
+from app.dependencies import logger
+from app.models import engine
+from app.routers import randoms
 
 #### Testing DB
 logger.info("Initialize database...")

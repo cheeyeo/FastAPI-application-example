@@ -2,23 +2,23 @@ FROM ghcr.io/astral-sh/uv:python3.13-trixie-slim AS builder
 
 # SET ENV
 ENV LIBRARY_PATH=/lib:/usr/lib
-ENV UV_PYTHON_INSTALL_DIR=/opt/uv/python
 # Enable bytecode compilation
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
 ENV UV_PYTHON_DOWNLOADS=0
+ENV UV_PYTHON=/usr/local/bin/python
 
 WORKDIR /app
 
 RUN --mount=type=cache,target=/root/.cache/uv \
   --mount=type=bind,source=uv.lock,target=uv.lock \
   --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --locked --no-dev --no-install-project
+    uv sync --locked --no-install-project --no-dev
 
 COPY . .
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-  uv sync --locked --no-dev
+    uv sync --locked --no-dev
 
 FROM python:3.13-slim-trixie AS runner
 SHELL [ "/bin/bash", "-c" ]

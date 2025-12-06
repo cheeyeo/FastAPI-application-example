@@ -1,8 +1,7 @@
 import os
-from typing import Annotated, Self
+from typing import Self
 
 from dotenv import load_dotenv
-from fastapi import Depends
 from pydantic import model_validator
 from sqlmodel import Field, Session, SQLModel, create_engine
 
