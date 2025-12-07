@@ -10,11 +10,19 @@ https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
 
 
 ### TUTORIAL
-- [ ] https://fastapi.tiangolo.com/tutorial/security/first-steps/
-- [ ] https://sqlmodel.tiangolo.com/tutorial/fastapi/
+- [x] https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/
+- [x] https://fastapi.tiangolo.com/tutorial/security/first-steps/
 - [x] https://fastapi.tiangolo.com/tutorial/sql-databases/
 - [x] https://fastapi.tiangolo.com/tutorial/bigger-applications/#an-example-file-structure
+- [ ] https://sqlmodel.tiangolo.com/tutorial/fastapi/
 
+
+### OAUTH2 
+- [ ] https://heeki.medium.com/understanding-oauth2-and-implementing-identity-aware-mcp-servers-221a06b1a6cf
+- [ ] https://dev.to/composiodev/mcp-oauth-21-a-complete-guide-3g91
+- [ ] https://hackernoon.com/oauth-20-for-dummies
+- [ ] https://github.com/modelcontextprotocol/python-sdk?tab=readme-ov-file#authentication
+- [ ] https://github.com/modelcontextprotocol/python-sdk/tree/main/examples/servers/simple-auth
 
 
 

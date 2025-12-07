@@ -6,6 +6,8 @@ dependencies = [
     "alembic>=1.17.2",
     "fastapi[standard]>=0.121.2",
     "psycopg2-binary>=2.9.11",
+    "pwdlib[argon2]>=0.3.0",
+    "pyjwt[crypto]>=2.10.1",
     "python-dotenv>=1.2.1",
     "sqlmodel>=0.0.27",
 ]
