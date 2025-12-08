@@ -15,7 +15,8 @@ https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
 - [x] https://fastapi.tiangolo.com/tutorial/middleware/
 - [x] https://fastapi.tiangolo.com/tutorial/cors/
 - [x] https://fastapi.tiangolo.com/tutorial/sql-databases/
-- [ ] https://fastapi.tiangolo.com/tutorial/bigger-applications/#an-example-file-structure
+- [ ] https://fastapi.tiangolo.com/tutorial/testing
+- [ ] https://fastapi.tiangolo.com/tutorial/bigger-applications/#an-example-file-structurec
 - [ ] https://sqlmodel.tiangolo.com/tutorial/fastapi/
 
 
