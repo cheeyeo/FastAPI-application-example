@@ -12,8 +12,10 @@ https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
 ### TUTORIAL
 - [x] https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/
 - [x] https://fastapi.tiangolo.com/tutorial/security/first-steps/
+- [x] https://fastapi.tiangolo.com/tutorial/middleware/
+- [x] https://fastapi.tiangolo.com/tutorial/cors/
 - [x] https://fastapi.tiangolo.com/tutorial/sql-databases/
-- [x] https://fastapi.tiangolo.com/tutorial/bigger-applications/#an-example-file-structure
+- [ ] https://fastapi.tiangolo.com/tutorial/bigger-applications/#an-example-file-structure
 - [ ] https://sqlmodel.tiangolo.com/tutorial/fastapi/
 
 
