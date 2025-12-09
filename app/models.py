@@ -47,3 +47,23 @@ class RandomItemUpdate(RandomItemBase):
         if self.min_value > self.max_value:
             raise ValueError("min value can't be greater than max value")
         return self
+
+
+class UserBase(SQLModel):
+    username: str
+    email: str | None = None
+    full_name: str | None = None
+    # disabled: bool | None = None
+
+
+class User(UserBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    password: str
+
+
+class UserCreate(UserBase):
+    password: str
+
+
+class UserPublic(UserBase):
+    id: int

@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 from app.dependencies import logger, fake_users_db, authenticate_user, UserInDB, CurrentActiveUser, Token, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, User
 from app.models import engine
-from app.routers import randoms
+from app.routers import randoms, users
 
 #### Testing DB
 logger.info("Initialize database...")
@@ -45,6 +45,7 @@ app.add_middleware(
 
 
 app.include_router(randoms.router)
+app.include_router(users.router)
 
 
 @app.get("/", tags=["Random Playground"])
