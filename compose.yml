@@ -14,7 +14,7 @@ services:
       timeout: 5s
       retries: 10
     volumes:
-      - pgdata2:/var/lib/postgresql/data
+      - fastapi_pgdata:/var/lib/postgresql/data
     ports:
       - 5432:5432
 
@@ -49,7 +49,6 @@ services:
           target: /app
           ignore:
             - __pycache__
-            - .venv/
         - action: rebuild
           path: uv.lock
         - action: rebuild
@@ -63,4 +62,4 @@ services:
       - 8000:8000
 
 volumes:
-  pgdata2:
+  fastapi_pgdata:

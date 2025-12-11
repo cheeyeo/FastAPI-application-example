@@ -1,10 +1,9 @@
 import os
-from typing import Annotated, Self
+from typing import Self
 
 from dotenv import load_dotenv
-from fastapi import Depends
 from pydantic import model_validator
-from sqlmodel import Field, Session, SQLModel, create_engine
+from sqlmodel import Field, Relationship, Session, SQLModel, create_engine
 
 load_dotenv()
 
@@ -19,7 +18,26 @@ def get_session():
         yield session
 
 
-SessionDep = Annotated[Session, Depends(get_session)]
+class UserBase(SQLModel):
+    username: str
+    email: str | None = None
+    full_name: str | None = None
+
+
+class User(UserBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    password: str
+    disabled: bool = False
+    randomitems: list["RandomItem"] = Relationship(back_populates="user")
+
+
+class UserCreate(UserBase):
+    password: str
+
+
+class UserPublic(UserBase):
+    id: int
+    disabled: bool
 
 
 class RandomItemBase(SQLModel):
@@ -30,6 +48,8 @@ class RandomItemBase(SQLModel):
 class RandomItem(RandomItemBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     num: int
+    user_id: int | None = Field(default=None, foreign_key="user.id")
+    user: User | None = Relationship(back_populates="randomitems")
 
 
 class RandomItemPublic(RandomItemBase):

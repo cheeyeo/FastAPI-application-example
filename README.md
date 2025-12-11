@@ -1,17 +1,31 @@
 ### FastAPI project
 
-Ref:
+### Ref
 
 https://realpython.com/fastapi-python-web-apis/
 
-Using databases with fastapi:
-https://fastapi.tiangolo.com/tutorial/sql-databases
 
 Full app with database:
 https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
 
 
-https://sqlmodel.tiangolo.com/tutorial/fastapi/multiple-models/#the-heropublic-data-model
+### TUTORIAL
+- [x] https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/
+- [x] https://fastapi.tiangolo.com/tutorial/security/first-steps/
+- [x] https://fastapi.tiangolo.com/tutorial/middleware/
+- [x] https://fastapi.tiangolo.com/tutorial/cors/
+- [x] https://fastapi.tiangolo.com/tutorial/sql-databases/
+- [ ] https://fastapi.tiangolo.com/tutorial/testing
+- [ ] https://fastapi.tiangolo.com/tutorial/bigger-applications/#an-example-file-structurec
+- [ ] https://sqlmodel.tiangolo.com/tutorial/fastapi/
+
+
+### OAUTH2 
+- [ ] https://heeki.medium.com/understanding-oauth2-and-implementing-identity-aware-mcp-servers-221a06b1a6cf
+- [ ] https://dev.to/composiodev/mcp-oauth-21-a-complete-guide-3g91
+- [ ] https://hackernoon.com/oauth-20-for-dummies
+- [ ] https://github.com/modelcontextprotocol/python-sdk?tab=readme-ov-file#authentication
+- [ ] https://github.com/modelcontextprotocol/python-sdk/tree/main/examples/servers/simple-auth
 
 
 
@@ -29,6 +43,16 @@ https://sqlmodel.tiangolo.com/tutorial/fastapi/multiple-models/#the-heropublic-d
 
 #### RUN LOCALY
 
+Create .env file with following values:
+```
+export RDS_USERNAME="xxx"
+export RDS_DB_NAME="xxx"
+export RDS_PASSWORD="xxx"
+export RDS_HOSTNAME="localhost"
+export RDS_PORT=5432
+export ENV_TYPE="dev"
+```
+
 ```
 docker compose -f compose.yml up
 ```
@@ -45,3 +69,5 @@ uv run ruff check --fix app/
 
 uv run ruff format app/
 ```
+
+https://github.com/astral-sh/uv-docker-example/blob/main/Dockerfile
