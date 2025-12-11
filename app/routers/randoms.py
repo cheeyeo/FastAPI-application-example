@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import select
 
-from app.dependencies import CurrentUser, SessionDep, logger
+from app.dependencies import CurrentActiveUser, SessionDep, logger
 from app.models import RandomItem, RandomItemCreate, RandomItemPublic, RandomItemUpdate
 
 router = APIRouter()
@@ -15,11 +15,16 @@ router = APIRouter()
 )
 async def read_randoms(
     session: SessionDep,
-    user: CurrentUser,
+    user: CurrentActiveUser,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
 ):
-    randoms = session.exec(select(RandomItem).offset(offset).limit(limit)).all()
+    randoms = session.exec(
+        select(RandomItem)
+        .where(RandomItem.user_id == user.id)
+        .offset(offset)
+        .limit(limit)
+    ).all()
     return randoms
 
 
@@ -28,8 +33,13 @@ async def read_randoms(
     response_model=RandomItemPublic,
     tags=["Random Items Management"],
 )
-async def read_random(random_id: int, session: SessionDep):
-    random_db = session.get(RandomItem, random_id)
+async def read_random(random_id: int, session: SessionDep, user: CurrentActiveUser):
+    # random_db = session.get(RandomItem, random_id)
+    random_db = session.exec(
+        select(RandomItem)
+        .where(RandomItem.user_id == user.id)
+        .where(RandomItem.id == random_id)
+    ).first()
     if not random_db:
         raise HTTPException(status_code=404, detail="Random Item not found")
     return random_db
@@ -38,11 +48,14 @@ async def read_random(random_id: int, session: SessionDep):
 @router.post(
     "/randoms/", response_model=RandomItemPublic, tags=["Random Items Management"]
 )
-async def create_random(item: RandomItemCreate, session: SessionDep):
+async def create_random(
+    item: RandomItemCreate, session: SessionDep, user: CurrentActiveUser
+):
     # NOTE: We use update here to set the num attribute dynamically which is a field in RandomItem but not in RandomItemCreate to solve pydantic missing attribute error
     new_item = RandomItem.model_validate(
         item, update={"num": random.randint(item.min_value, item.max_value)}
     )
+    new_item.user = user
     session.add(new_item)
     session.commit()
     session.refresh(new_item)
@@ -56,9 +69,16 @@ async def create_random(item: RandomItemCreate, session: SessionDep):
     tags=["Random Items Management"],
 )
 async def update_random(
-    random_id: int, random_item: RandomItemUpdate, session: SessionDep
+    random_id: int,
+    random_item: RandomItemUpdate,
+    session: SessionDep,
+    user: CurrentActiveUser,
 ):
-    random_db = session.get(RandomItem, random_id)
+    random_db = session.exec(
+        select(RandomItem)
+        .where(RandomItem.user_id == user.id)
+        .where(RandomItem.id == random_id)
+    ).first()
     if not random_db:
         raise HTTPException(status_code=404, detail="Random item not found")
 
@@ -79,8 +99,13 @@ async def update_random(
 
 
 @router.delete("/randoms/{random_id}", tags=["Random Items Management"])
-async def delete_random(random_id: int, session: SessionDep):
-    random_db = session.get(RandomItem, random_id)
+async def delete_random(random_id: int, session: SessionDep, user: CurrentActiveUser):
+    # random_db = session.get(RandomItem, random_id)
+    random_db = session.exec(
+        select(RandomItem)
+        .where(RandomItem.user_id == user.id)
+        .where(RandomItem.id == random_id)
+    ).first()
     if not random_db:
         raise HTTPException(status_code=404, detail="Random item not found")
     session.delete(random_db)

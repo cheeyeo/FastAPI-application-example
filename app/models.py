@@ -3,7 +3,7 @@ from typing import Self
 
 from dotenv import load_dotenv
 from pydantic import model_validator
-from sqlmodel import Field, Session, SQLModel, create_engine
+from sqlmodel import Field, Relationship, Session, SQLModel, create_engine
 
 load_dotenv()
 
@@ -18,6 +18,28 @@ def get_session():
         yield session
 
 
+class UserBase(SQLModel):
+    username: str
+    email: str | None = None
+    full_name: str | None = None
+
+
+class User(UserBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    password: str
+    disabled: bool = False
+    randomitems: list["RandomItem"] = Relationship(back_populates="user")
+
+
+class UserCreate(UserBase):
+    password: str
+
+
+class UserPublic(UserBase):
+    id: int
+    disabled: bool
+
+
 class RandomItemBase(SQLModel):
     min_value: int
     max_value: int
@@ -26,6 +48,8 @@ class RandomItemBase(SQLModel):
 class RandomItem(RandomItemBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     num: int
+    user_id: int | None = Field(default=None, foreign_key="user.id")
+    user: User | None = Relationship(back_populates="randomitems")
 
 
 class RandomItemPublic(RandomItemBase):
@@ -47,23 +71,3 @@ class RandomItemUpdate(RandomItemBase):
         if self.min_value > self.max_value:
             raise ValueError("min value can't be greater than max value")
         return self
-
-
-class UserBase(SQLModel):
-    username: str
-    email: str | None = None
-    full_name: str | None = None
-    # disabled: bool | None = None
-
-
-class User(UserBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    password: str
-
-
-class UserCreate(UserBase):
-    password: str
-
-
-class UserPublic(UserBase):
-    id: int
