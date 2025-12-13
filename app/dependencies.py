@@ -11,13 +11,12 @@ from pwdlib import PasswordHash
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
-from app.models import User, get_session
 from app.core.aws_cognito import AWSCognito
+from app.models import User, get_session
 
 
 def get_aws_cognito() -> AWSCognito:
     return AWSCognito()
-
 
 
 logging.basicConfig(level=logging.INFO)
