@@ -12,6 +12,13 @@ from pydantic import BaseModel
 from sqlmodel import Session, select
 
 from app.models import User, get_session
+from app.core.aws_cognito import AWSCognito
+
+
+def get_aws_cognito() -> AWSCognito:
+    return AWSCognito()
+
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -24,7 +31,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 password_hash = PasswordHash.recommended()
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/token")
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/users/login")
 SessionDep = Annotated[Session, Depends(get_session)]
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
 
@@ -71,6 +78,29 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
+async def get_current_user_cognito(token: TokenDep):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        payload = get_aws_cognito().decode_token(token)
+        username = payload.get("username")
+        if username is None:
+            raise credentials_exception
+    except InvalidTokenError:
+        raise credentials_exception
+
+    user = get_user(username)
+    if user is None:
+        raise credentials_exception
+
+    return user
+
+
+
 async def get_current_user(token: TokenDep):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -93,7 +123,7 @@ async def get_current_user(token: TokenDep):
     return user
 
 
-CurrentUser = Annotated[User, Depends(get_current_user)]
+CurrentUser = Annotated[User, Depends(get_current_user_cognito)]
 
 
 async def get_current_active_user(current_user: CurrentUser):

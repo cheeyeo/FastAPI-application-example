@@ -1,7 +1,8 @@
 from datetime import timedelta
 from typing import Annotated
+import json
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.dependencies import (
@@ -9,27 +10,30 @@ from app.dependencies import (
     CurrentActiveUser,
     SessionDep,
     Token,
+    TokenDep,
     authenticate_user,
     create_access_token,
     get_password_hash,
+    get_aws_cognito,
+    logger
 )
 from app.models import User, UserCreate, UserPublic
+from app.core.aws_cognito import AWSCognito, UserSignup, UserSignin, UserVerify
+from app.services.cognito import AuthService
+
 
 router = APIRouter()
 
 
-@router.post("/users/signup/", response_model=Token)
-async def create_users(user: UserCreate, session: SessionDep):
-    db_user = User.model_validate(user)
-    db_user.password = get_password_hash(user.password)
+@router.post("/users/signup")
+async def create_users(user: UserSignup, session: SessionDep, cognito: AWSCognito = Depends(get_aws_cognito)):
+    resp = AuthService.user_signup(user, cognito)
+    db_user = User(username=user.username, email=user.email, password=get_password_hash(user.password))
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": db_user.username}, expires_delta=access_token_expires
-    )
-    return Token(access_token=access_token, token_type="bearer")
+
+    return resp
 
 
 @router.get("/users/me", response_model=UserPublic)
@@ -37,21 +41,25 @@ async def read_users_me(current_user: CurrentActiveUser):
     return current_user
 
 
-@router.post("/token")
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
-    user = authenticate_user(form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+@router.post("/users/login")
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], cognito: AWSCognito = Depends(get_aws_cognito)) -> Token:
+    resp = AuthService.user_signin(UserSignin(username=form_data.username, password=form_data.password), cognito)
+    logger.info(resp)
+    content = json.loads(resp.body.decode("utf-8"))
+    return Token(access_token=content.get("AccessToken"), token_type="bearer")
 
-    if user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
 
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
-    )
-    return Token(access_token=access_token, token_type="bearer")
+# TODO: The auth token is set inside the header via CurrentActiveUser but not accessible
+# hence we get it through the request header but need better way to handle this...
+@router.post("/users/logout")
+async def logout(token: TokenDep, current_user: CurrentActiveUser, cognito: AWSCognito = Depends(get_aws_cognito)):
+    return AuthService.logout(token, cognito)
+
+
+@router.post("/users/verify")
+async def verify(data: UserVerify, current_user: CurrentActiveUser, cognito: AWSCognito = Depends(get_aws_cognito)):
+    return AuthService.verify_account(data, cognito)
+
+@router.post("/users/resend_confirmation_code")
+async def resend_code(username: str, current_user: CurrentActiveUser, cognito: AWSCognito = Depends(get_aws_cognito)):
+    return AuthService.resend_confirmation(username, cognito)
