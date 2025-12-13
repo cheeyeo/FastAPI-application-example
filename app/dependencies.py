@@ -100,7 +100,6 @@ async def get_current_user_cognito(token: TokenDep):
     return user
 
 
-
 async def get_current_user(token: TokenDep):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

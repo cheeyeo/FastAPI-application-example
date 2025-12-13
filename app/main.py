@@ -18,11 +18,18 @@ except Exception as e:
 
 # Customize swagger docs
 tags_metadata = [
-    {"name": "Random Playground", "description": "Generate random numbers"},
+    {
+        "name": "Random Playground", 
+        "description": "Generate random numbers"
+    },
     {
         "name": "Random Items Management",
         "description": "Create, read, update and delete random numbers",
     },
+    {
+        "name": "Authentication",
+        "description": "OAUTH2 authentication flow via Cognito"
+    }
 ]
 
 
