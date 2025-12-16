@@ -47,7 +47,6 @@ async def login(
     resp = AuthService.user_signin(
         UserSignin(username=form_data.username, password=form_data.password), cognito
     )
-    logger.info(resp)
     content = json.loads(resp.body.decode("utf-8"))
     return Token(access_token=content.get("AccessToken"), token_type="bearer")
 

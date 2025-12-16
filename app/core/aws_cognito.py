@@ -105,7 +105,6 @@ class AWSCognito:
 
         response = self.client.initiate_auth(
             ClientId=AWS_COGNITO_APP_CLIENT_ID,
-            # SecretHash=secret_hash,
             AuthFlow="USER_PASSWORD_AUTH",
             AuthParameters={
                 "USERNAME": data.username,

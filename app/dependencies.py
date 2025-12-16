@@ -33,6 +33,7 @@ password_hash = PasswordHash.recommended()
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/users/login")
 SessionDep = Annotated[Session, Depends(get_session)]
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
+CognitoDep = Annotated[AWSCognito, Depends(get_aws_cognito)]
 
 
 class Token(BaseModel):
@@ -77,7 +78,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-async def get_current_user_cognito(token: TokenDep):
+async def get_current_user_cognito(cognito: CognitoDep, token: TokenDep):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -85,7 +86,7 @@ async def get_current_user_cognito(token: TokenDep):
     )
 
     try:
-        payload = get_aws_cognito().decode_token(token)
+        payload = cognito.decode_token(token)
         username = payload.get("username")
         if username is None:
             raise credentials_exception

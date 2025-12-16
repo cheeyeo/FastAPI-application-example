@@ -45,8 +45,6 @@ key roles in OAuth flow
 
 * https://docs.aws.amazon.com/cognito/latest/developerguide/token-revocation.html
 
-* https://docs.aws.amazon.com/cognito/latest/developerguide/token-revocation.html
-
 * https://stackoverflow.com/questions/76867554/fastapi-how-to-access-bearer-token
 
 * https://medium.com/@prithvi.atal/securing-fastapi-applications-with-aws-cognito-a-step-by-step-guide-to-jwt-authentication-0a34002f60f5
