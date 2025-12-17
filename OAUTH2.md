@@ -71,6 +71,10 @@ key roles in OAuth flow
     https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-pre-token-generation.html#aws-lambda-triggers-pre-token-generation-example-version-2-overview
 
 
+* Example of PreToken Lambda trigger for Agent
+
+  https://aws.amazon.com/blogs/security/empower-ai-agents-with-user-context-using-amazon-cognito/
+
 
 
 ### REFS:
