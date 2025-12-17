@@ -40,6 +40,38 @@ key roles in OAuth flow
     need to cache the token with the user 
 
 
+### On using Custom scopes via Cognito
+
+* Need to create a Resource Server for the user pool first in order to define custom scopes:
+
+    https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-define-resource-servers.html#cognito-user-pools-define-resource-servers-about-resource-servers
+
+
+* Can't access custom scopes using the boto3 cognito-idp client; need to create a custom domain and then point it to the Token Endpoint:
+    ```
+    The token endpoint becomes publicly available when you add a domain to your user pool.
+    ```
+
+    https://docs.aws.amazon.com/cognito/latest/developerguide/token-endpoint.html
+
+
+    https://github.com/aws/aws-sdk/issues/178
+
+    https://github.com/aws/aws-sdk/issues/178#issuecomment-2389662983
+
+* To fix the issue of not being able to use custom domain, can use Lambda Triggers:
+
+    https://aws.amazon.com/blogs/security/how-to-customize-access-tokens-in-amazon-cognito-user-pools/
+
+    https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-pre-token-generation.html
+
+
+    example using Node.js:
+
+    https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-pre-token-generation.html#aws-lambda-triggers-pre-token-generation-example-version-2-overview
+
+
+
 
 ### REFS:
 

@@ -1,7 +1,7 @@
 import json
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Security
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.core.aws_cognito import AWSCognito, UserSignin, UserSignup, UserVerify
@@ -48,6 +48,7 @@ async def login(
         UserSignin(username=form_data.username, password=form_data.password), cognito
     )
     content = json.loads(resp.body.decode("utf-8"))
+    logger.info(f"INSIDE USER LOGIN - {content}")
     return Token(access_token=content.get("AccessToken"), token_type="bearer")
 
 
@@ -71,7 +72,6 @@ async def read_users_me(current_user: CurrentActiveUser):
 @router.get("/users/logout", tags=["Authentication"])
 async def logout(
     token: TokenDep,
-    current_user: CurrentActiveUser,
     cognito: AWSCognito = Depends(get_aws_cognito),
 ):
     return AuthService.logout(token, cognito)
