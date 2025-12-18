@@ -28,7 +28,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 password_hash = PasswordHash.recommended()
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/users/login", scopes={"me": "Information about user", "randoms:list": "List of random numbers"})
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/users/login", scopes={"me": "Information about user", "randoms": "Random numbers API"})
 SessionDep = Annotated[Session, Depends(get_session)]
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
 CognitoDep = Annotated[AWSCognito, Depends(get_aws_cognito)]
@@ -110,4 +110,4 @@ async def get_current_active_user(current_user: Annotated[User, Security(get_cur
 
 
 CurrentActiveUser = Annotated[User, Depends(get_current_active_user)]
-CurrentActiveUserRandoms = Annotated[User, Security(get_current_active_user, scopes=["randoms:list"])]
+CurrentActiveUserRandoms = Annotated[User, Security(get_current_active_user, scopes=["randoms"])]
