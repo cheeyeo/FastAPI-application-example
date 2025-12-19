@@ -23,6 +23,7 @@ tags_metadata = [
         "name": "Random Items Management",
         "description": "Create, read, update and delete random numbers",
     },
+    {"name": "Authentication", "description": "OAUTH2 authentication flow via Cognito"},
 ]
 
 

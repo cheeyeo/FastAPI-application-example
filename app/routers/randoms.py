@@ -1,10 +1,10 @@
 import random
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Security
 from sqlmodel import select
 
-from app.dependencies import CurrentActiveUser, SessionDep, logger
+from app.dependencies import CurrentActiveUser, CurrentActiveUserRandoms, SessionDep, logger
 from app.models import RandomItem, RandomItemCreate, RandomItemPublic, RandomItemUpdate
 
 router = APIRouter()
@@ -15,7 +15,7 @@ router = APIRouter()
 )
 async def read_randoms(
     session: SessionDep,
-    user: CurrentActiveUser,
+    user: CurrentActiveUserRandoms,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
 ):
@@ -33,8 +33,7 @@ async def read_randoms(
     response_model=RandomItemPublic,
     tags=["Random Items Management"],
 )
-async def read_random(random_id: int, session: SessionDep, user: CurrentActiveUser):
-    # random_db = session.get(RandomItem, random_id)
+async def read_random(random_id: int, session: SessionDep, user: CurrentActiveUserRandoms):
     random_db = session.exec(
         select(RandomItem)
         .where(RandomItem.user_id == user.id)
@@ -49,7 +48,7 @@ async def read_random(random_id: int, session: SessionDep, user: CurrentActiveUs
     "/randoms/", response_model=RandomItemPublic, tags=["Random Items Management"]
 )
 async def create_random(
-    item: RandomItemCreate, session: SessionDep, user: CurrentActiveUser
+    item: RandomItemCreate, session: SessionDep, user: CurrentActiveUserRandoms
 ):
     # NOTE: We use update here to set the num attribute dynamically which is a field in RandomItem but not in RandomItemCreate to solve pydantic missing attribute error
     new_item = RandomItem.model_validate(
@@ -72,7 +71,7 @@ async def update_random(
     random_id: int,
     random_item: RandomItemUpdate,
     session: SessionDep,
-    user: CurrentActiveUser,
+    user: CurrentActiveUserRandoms,
 ):
     random_db = session.exec(
         select(RandomItem)
@@ -99,8 +98,7 @@ async def update_random(
 
 
 @router.delete("/randoms/{random_id}", tags=["Random Items Management"])
-async def delete_random(random_id: int, session: SessionDep, user: CurrentActiveUser):
-    # random_db = session.get(RandomItem, random_id)
+async def delete_random(random_id: int, session: SessionDep, user: CurrentActiveUserRandoms):
     random_db = session.exec(
         select(RandomItem)
         .where(RandomItem.user_id == user.id)

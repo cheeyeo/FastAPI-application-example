@@ -1,57 +1,77 @@
-from datetime import timedelta
+import json
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Security
 from fastapi.security import OAuth2PasswordRequestForm
 
+from app.core.aws_cognito import AWSCognito, UserSignin, UserSignup, UserVerify
 from app.dependencies import (
-    ACCESS_TOKEN_EXPIRE_MINUTES,
     CurrentActiveUser,
     SessionDep,
     Token,
-    authenticate_user,
-    create_access_token,
+    TokenDep,
+    get_aws_cognito,
     get_password_hash,
+    logger,
 )
-from app.models import User, UserCreate, UserPublic
+from app.models import User, UserPublic
+from app.services.cognito import AuthService
 
 router = APIRouter()
 
 
-@router.post("/users/signup/", response_model=Token)
-async def create_users(user: UserCreate, session: SessionDep):
-    db_user = User.model_validate(user)
-    db_user.password = get_password_hash(user.password)
+@router.post("/users/signup", tags=["Authentication"])
+async def create_users(
+    user: UserSignup,
+    session: SessionDep,
+    cognito: AWSCognito = Depends(get_aws_cognito),
+):
+    resp = AuthService.user_signup(user, cognito)
+    db_user = User(
+        username=user.username,
+        email=user.email,
+        password=get_password_hash(user.password),
+    )
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": db_user.username}, expires_delta=access_token_expires
+
+    return resp
+
+
+@router.post("/users/login", tags=["Authentication"])
+async def login(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    cognito: AWSCognito = Depends(get_aws_cognito),
+) -> Token:
+    resp = AuthService.user_signin(
+        UserSignin(username=form_data.username, password=form_data.password), cognito
     )
-    return Token(access_token=access_token, token_type="bearer")
+    content = json.loads(resp.body.decode("utf-8"))
+    logger.info(f"INSIDE USER LOGIN - {content}")
+    return Token(access_token=content.get("AccessToken"), token_type="bearer")
 
 
-@router.get("/users/me", response_model=UserPublic)
+@router.post("/users/verify", tags=["Authentication"])
+async def verify(data: UserVerify, cognito: AWSCognito = Depends(get_aws_cognito)):
+    return AuthService.verify_account(data, cognito)
+
+
+@router.post("/users/resend_confirmation_code", tags=["Authentication"])
+async def resend_code(username: str, cognito: AWSCognito = Depends(get_aws_cognito)):
+    return AuthService.resend_confirmation(username, cognito)
+
+
+@router.get("/users/me", response_model=UserPublic, tags=["Authentication"])
 async def read_users_me(current_user: CurrentActiveUser):
     return current_user
 
 
-@router.post("/token")
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
-    user = authenticate_user(form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    if user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
-
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
-    )
-    return Token(access_token=access_token, token_type="bearer")
+# TODO: Using the Authorize form the authentication token is set in the header via Swagger UI
+# even if we call /users/logout, the auth token will still be in the headers; the only way to logout in the swagger UI is via the same authorize form > logout link
+@router.get("/users/logout", tags=["Authentication"])
+async def logout(
+    token: TokenDep,
+    cognito: AWSCognito = Depends(get_aws_cognito),
+):
+    return AuthService.logout(token, cognito)
