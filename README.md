@@ -66,7 +66,7 @@ https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
 
 ### TUTORIAL
 - [ ] https://fastapi.tiangolo.com/tutorial/testing
-- [ ] https://fastapi.tiangolo.com/tutorial/bigger-applications/
+- [x] https://fastapi.tiangolo.com/tutorial/bigger-applications/
 - [ ] https://sqlmodel.tiangolo.com/tutorial/fastapi/
 - [x] https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/
 - [x] https://fastapi.tiangolo.com/tutorial/security/first-steps/
@@ -98,3 +98,11 @@ https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
 * Run `alembic revision --autogenerate -m "MESSAGE" to detect and create the migrations based on existing model fields....
 
 * Run `alembic upgrade head` to run migrations
+
+
+### On running tests via pytest
+
+From root folder:
+```
+uv run -m pytest -p no:cacheprovider -s -v
+```

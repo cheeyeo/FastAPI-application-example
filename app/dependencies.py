@@ -2,6 +2,7 @@ import logging
 import os
 from typing import Annotated
 
+import boto3
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from jwt.exceptions import InvalidTokenError
@@ -13,12 +14,9 @@ from app.core.aws_cognito import AWSCognito
 from app.models import User, get_session
 
 
-def get_aws_cognito() -> AWSCognito:
-    return AWSCognito()
-
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 # generate secret key using:
 # openssl rand -hex 32
@@ -31,6 +29,16 @@ password_hash = PasswordHash.recommended()
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/users/login", scopes={"me": "Information about user", "randoms": "Random numbers API"})
 SessionDep = Annotated[Session, Depends(get_session)]
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
+
+
+def get_aws_cognito() -> AWSCognito:
+    return AWSCognito(
+        client=boto3.client("cognito-idp", region_name=os.getenv("AWS_REGION")), 
+        region=os.getenv("AWS_REGION"),
+        client_id=os.getenv("AWS_COGNITO_APP_CLIENT_ID"), 
+        client_secret=os.getenv("AWS_COGNITO_APP_CLIENT_SECRET"),
+        user_pool_id=os.getenv("AWS_USER_POOL_ID"))
+
 CognitoDep = Annotated[AWSCognito, Depends(get_aws_cognito)]
 
 
@@ -74,7 +82,6 @@ async def get_current_user_cognito(security_scopes: SecurityScopes, cognito: Cog
 
     try:
         payload = cognito.decode_token(token)
-        logger.info(f"PAYLOAD IN GET CURRENT USER: {payload}")
         username = payload.get("username")
         if username is None:
             raise credentials_exception

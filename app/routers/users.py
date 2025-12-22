@@ -13,6 +13,7 @@ from app.dependencies import (
     get_aws_cognito,
     get_password_hash,
     logger,
+    CognitoDep,
 )
 from app.models import User, UserPublic
 from app.services.cognito import AuthService
@@ -42,7 +43,7 @@ async def create_users(
 @router.post("/users/login", tags=["Authentication"])
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    cognito: AWSCognito = Depends(get_aws_cognito),
+    cognito: CognitoDep,
 ) -> Token:
     resp = AuthService.user_signin(
         UserSignin(username=form_data.username, password=form_data.password), cognito

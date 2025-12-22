@@ -7,14 +7,13 @@ from app.models import engine
 from app.core.application import create_app
 
 
-if __name__ == "__main__":
-    #### Testing DB
-    logger.info("Initialize database...")
-    try:
-        with Session(engine) as session:
-            session.exec(select(1))
-    except Exception as e:
-        logger.error(e)
-        raise e
+#### Testing DB
+logger.info("Initialize database...")
+try:
+    with Session(engine) as session:
+        session.exec(select(1))
+except Exception as e:
+    logger.error(e)
+    raise e
 
-    app = create_app()
+App = create_app()

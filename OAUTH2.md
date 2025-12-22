@@ -100,3 +100,7 @@ key roles in OAuth flow
 * https://cameledge.com/post/web-development/secure-api-oauth2-jwt-aws-cognito-part-1
 
 * https://cameledge.com/post/web-development/secure-api-oauth2-jwt-aws-cognito-part-2
+
+
+
+https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/python/example_code/cognito/cognito_idp_actions.py

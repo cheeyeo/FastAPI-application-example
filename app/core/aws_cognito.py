@@ -32,20 +32,24 @@ class UserVerify(BaseModel):
 
 
 class AWSCognito:
-    def __init__(self):
-        self.client = boto3.client("cognito-idp", region_name=AWS_REGION)
+    def __init__(self, client, region, client_id, client_secret, user_pool_id):
+        self.client = client
+        self.region = region
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.user_pool_id = user_pool_id
 
     def user_signup(self, user: UserSignup):
         secret_hash = base64.b64encode(
             hmac.new(
-                bytes(AWS_COGNITO_APP_CLIENT_SECRET, "utf-8"),
-                bytes(user.username + AWS_COGNITO_APP_CLIENT_ID, "utf-8"),
+                bytes(self.client_secret, "utf-8"),
+                bytes(user.username + self.client_id, "utf-8"),
                 digestmod=hashlib.sha256,
             ).digest()
         ).decode()
 
         response = self.client.sign_up(
-            ClientId=AWS_COGNITO_APP_CLIENT_ID,
+            ClientId=self.client_id,
             SecretHash=secret_hash,
             Username=user.username,
             Password=user.password,
@@ -60,14 +64,14 @@ class AWSCognito:
     def verify_account(self, data: UserVerify):
         secret_hash = base64.b64encode(
             hmac.new(
-                bytes(AWS_COGNITO_APP_CLIENT_SECRET, "utf-8"),
-                bytes(data.username + AWS_COGNITO_APP_CLIENT_ID, "utf-8"),
+                bytes(self.client_secret, "utf-8"),
+                bytes(data.username + self.client_id, "utf-8"),
                 digestmod=hashlib.sha256,
             ).digest()
         ).decode()
 
         response = self.client.confirm_sign_up(
-            ClientId=AWS_COGNITO_APP_CLIENT_ID,
+            ClientId=self.client_id,
             Username=data.username,
             ConfirmationCode=data.confirmation_code,
             SecretHash=secret_hash,
@@ -80,14 +84,14 @@ class AWSCognito:
 
         secret_hash = base64.b64encode(
             hmac.new(
-                bytes(AWS_COGNITO_APP_CLIENT_SECRET, "utf-8"),
-                bytes(username + AWS_COGNITO_APP_CLIENT_ID, "utf-8"),
+                bytes(self.client_secret, "utf-8"),
+                bytes(username + self.client_id, "utf-8"),
                 digestmod=hashlib.sha256,
             ).digest()
         ).decode()
 
         response = self.client.resend_confirmation_code(
-            ClientId=AWS_COGNITO_APP_CLIENT_ID,
+            ClientId=self.client_id,
             Username=username,
             SecretHash=secret_hash,
         )
@@ -97,14 +101,14 @@ class AWSCognito:
     def user_signin(self, data: UserSignin):
         secret_hash = base64.b64encode(
             hmac.new(
-                bytes(AWS_COGNITO_APP_CLIENT_SECRET, "utf-8"),
-                bytes(data.username + AWS_COGNITO_APP_CLIENT_ID, "utf-8"),
+                bytes(self.client_secret, "utf-8"),
+                bytes(data.username + self.client_id, "utf-8"),
                 digestmod=hashlib.sha256,
             ).digest()
         ).decode()
 
         response = self.client.initiate_auth(
-            ClientId=AWS_COGNITO_APP_CLIENT_ID,
+            ClientId=self.client_id,
             AuthFlow="USER_PASSWORD_AUTH",
             AuthParameters={
                 "USERNAME": data.username,
@@ -117,12 +121,11 @@ class AWSCognito:
 
     def logout(self, access_token: str):
         response = self.client.global_sign_out(AccessToken=access_token)
-
         return response
 
     def get_jwks(self):
         """Fetches the JSON Web Key Set (JWKS) from Cognito."""
-        jwks_url = f"https://cognito-idp.{AWS_REGION}.amazonaws.com/{AWS_USER_POOL_ID}/.well-known/jwks.json"
+        jwks_url = f"https://cognito-idp.{self.region}.amazonaws.com/{self.user_pool_id}/.well-known/jwks.json"
         response = httpx.get(jwks_url)
         return response.json()
 
@@ -149,7 +152,7 @@ class AWSCognito:
                 token,
                 rsa_key,
                 algorithms=["RS256"],
-                audience=AWS_COGNITO_APP_CLIENT_ID,
+                audience=self.client_id,
                 options={"verify_aud": True},
             )
 
