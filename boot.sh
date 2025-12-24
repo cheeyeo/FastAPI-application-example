@@ -9,4 +9,4 @@ echo "Running migrations..."
 alembic upgrade head
 
 echo "Starting application..."
-fastapi run --workers 4 app/main.py
+fastapi run app/main.py

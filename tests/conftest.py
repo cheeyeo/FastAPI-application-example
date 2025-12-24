@@ -5,6 +5,7 @@ import requests
 from fastapi.testclient import TestClient
 import boto3
 from sqlmodel import Session, SQLModel, create_engine
+from sqlalchemy import delete
 from moto import mock_aws
 from dotenv import dotenv_values
 from app.core.application import create_app
@@ -81,14 +82,12 @@ def mock_token():
     return return_token
 
 
-@pytest.fixture(name="session")
+@pytest.fixture(name="session", scope="session")
 def session_fixture():
-    # config = {
-    #     **dotenv_values(".env.test"),
-    #     **os.environ,
-    # }
-
-    config = dotenv_values(".env.test")
+    config = {
+        **os.environ,
+        **dotenv_values(".env.test"),
+    }
 
     postgresql_url = f"postgresql://{config.get('RDS_USERNAME')}:{config.get('RDS_PASSWORD')}@{config.get('RDS_HOSTNAME')}:{config.get('RDS_PORT')}/{config.get('RDS_DB_NAME')}"
     
@@ -100,7 +99,7 @@ def session_fixture():
         yield session
 
 
-@pytest.fixture(name="user")
+@pytest.fixture(name="user", scope="session")
 def user_fixture(session):
     db_user = User(
         username="test_username",
@@ -112,8 +111,9 @@ def user_fixture(session):
     session.refresh(db_user)
 
 
-@pytest.fixture(name="client")
+@pytest.fixture(name="client", scope="session")
 def client_fixture(session, user):
+    # Overrides the database dependency to use the test session
     def get_session_override():
         return session
     
@@ -123,3 +123,9 @@ def client_fixture(session, user):
     client = TestClient(app)
     yield client
     app.dependency_overrides.clear()
+
+    # clear data from test database
+    for model in [RandomItem, User]:
+        stmt = delete(model)
+        session.exec(stmt)
+        session.commit()

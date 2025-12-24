@@ -112,7 +112,7 @@ hence need to pass it in cli rather than the compose config file:
 
 
 ```
-docker compose --env-file .env.test -f compose.test.yml down
+docker compose --env-file .env.test -f compose.test.yml up
 ```
 
 
