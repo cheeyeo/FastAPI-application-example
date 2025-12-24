@@ -68,7 +68,7 @@ def get_user(username: str):
         return user
 
 
-async def get_current_user_cognito(security_scopes: SecurityScopes, cognito: CognitoDep, token: TokenDep):
+async def get_current_user_cognito(security_scopes: SecurityScopes, cognito: CognitoDep, token: TokenDep, session: SessionDep):
     if security_scopes.scopes:
         authenticate_value = f"Bearer scope={security_scopes.scope_str}"
     else:
@@ -92,7 +92,7 @@ async def get_current_user_cognito(security_scopes: SecurityScopes, cognito: Cog
     except InvalidTokenError:
         raise credentials_exception
 
-    user = get_user(username)
+    user = session.exec(select(User).where(User.username == username)).first()
     if user is None:
         raise credentials_exception
     

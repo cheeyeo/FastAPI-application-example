@@ -14,6 +14,7 @@ def test_get_randoms_not_authenticated(client):
 # TODO: How to create temp authenticated Cognito user?
 def test_get_randoms_authenticated(client, mock_cognito_client, mock_token, monkeypatch):
     # Stub out the environment variables
+    monkeypatch.setenv("AWS_REGION", mock_cognito_client.region)
     monkeypatch.setenv("AWS_USER_POOL_ID", mock_cognito_client.user_pool_id)
     monkeypatch.setenv("AWS_COGNITO_APP_CLIENT_ID", mock_cognito_client.client_id)
     monkeypatch.setenv("AWS_COGNITO_APP_CLIENT_SECRET", mock_cognito_client.client_secret)
@@ -28,4 +29,5 @@ def test_get_randoms_authenticated(client, mock_cognito_client, mock_token, monk
     assert token is not None
 
     response = client.get("/randoms", headers={"Authorization": f"Bearer {token}"})
-    print(response)
+    assert response.status_code == 200
+    assert response.json() == []

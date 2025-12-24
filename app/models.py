@@ -7,13 +7,17 @@ from sqlmodel import Field, Relationship, Session, SQLModel, create_engine
 
 load_dotenv()
 
-postgresql_url = f"postgresql://{os.environ.get('RDS_USERNAME')}:{os.environ.get('RDS_PASSWORD')}@{os.environ.get('RDS_HOSTNAME')}:{os.environ.get('RDS_PORT')}/{os.environ.get('RDS_DB_NAME')}"
+# postgresql_url = f"postgresql://{os.environ.get('RDS_USERNAME')}:{os.environ.get('RDS_PASSWORD')}@{os.environ.get('RDS_HOSTNAME')}:{os.environ.get('RDS_PORT')}/{os.environ.get('RDS_DB_NAME')}"
 
 
-engine = create_engine(postgresql_url, connect_args={})
+# engine = create_engine(postgresql_url, connect_args={})
 
 
 def get_session():
+    postgresql_url = f"postgresql://{os.environ.get('RDS_USERNAME')}:{os.environ.get('RDS_PASSWORD')}@{os.environ.get('RDS_HOSTNAME')}:{os.environ.get('RDS_PORT')}/{os.environ.get('RDS_DB_NAME')}"
+    
+    engine = create_engine(postgresql_url, connect_args={})
+
     with Session(engine) as session:
         yield session
 

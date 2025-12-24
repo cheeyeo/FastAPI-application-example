@@ -103,6 +103,20 @@ https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
 ### On running tests via pytest
 
 From root folder:
+
+
+Start the test database passing in the env file
+
+Note: by default compose uses `.env` as the default env file; using a different env filename will not get the new values to be read by the container from compose...
+hence need to pass it in cli rather than the compose config file:
+
+
+```
+docker compose --env-file .env.test -f compose.test.yml down
+```
+
+
+In another terminal:
 ```
 uv run -m pytest -p no:cacheprovider -s -v
 ```

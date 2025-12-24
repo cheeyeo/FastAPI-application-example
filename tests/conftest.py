@@ -1,13 +1,16 @@
 import os
 from typing import Any
 import pytest
+import requests
 from fastapi.testclient import TestClient
 import boto3
-import requests
+from sqlmodel import Session, SQLModel, create_engine
 from moto import mock_aws
+from dotenv import dotenv_values
 from app.core.application import create_app
 from app.core.aws_cognito import AWSCognito, UserSignup
-from app.dependencies import CognitoDep
+from app.dependencies import CognitoDep, get_password_hash
+from app.models import UserBase, User, RandomItemBase, RandomItem, get_session
 
 
 @pytest.fixture(scope="session")
@@ -72,18 +75,51 @@ def mock_token():
             "iat": 1662022792,
             "jti": "d5d3f3d9-c02d-41e7-a9da-4443278d61cf",
             "username": "test_username",
+            "scope": "me randoms"
         }
     
     return return_token
 
 
-@pytest.fixture(scope="session")
-def app():
+@pytest.fixture(name="session")
+def session_fixture():
+    # config = {
+    #     **dotenv_values(".env.test"),
+    #     **os.environ,
+    # }
+
+    config = dotenv_values(".env.test")
+
+    postgresql_url = f"postgresql://{config.get('RDS_USERNAME')}:{config.get('RDS_PASSWORD')}@{config.get('RDS_HOSTNAME')}:{config.get('RDS_PORT')}/{config.get('RDS_DB_NAME')}"
+    
+    engine = create_engine(postgresql_url, connect_args={})
+    
+    SQLModel.metadata.create_all(engine)
+
+    with Session(engine) as session:
+        yield session
+
+
+@pytest.fixture(name="user")
+def user_fixture(session):
+    db_user = User(
+        username="test_username",
+        email="test_mail@test.com",
+        password=get_password_hash("SecurePassword1234#$%")
+    )
+    session.add(db_user)
+    session.commit()
+    session.refresh(db_user)
+
+
+@pytest.fixture(name="client")
+def client_fixture(session, user):
+    def get_session_override():
+        return session
+    
     app = create_app()
-    yield app
+    app.dependency_overrides[get_session] = get_session_override
 
-
-@pytest.fixture(scope="session")
-def client(app):
     client = TestClient(app)
-    return client
+    yield client
+    app.dependency_overrides.clear()
