@@ -10,6 +10,7 @@ from moto import mock_aws
 from dotenv import dotenv_values
 from app.core.application import create_app
 from app.core.aws_cognito import AWSCognito, UserSignup
+import app.dependencies
 from app.dependencies import CognitoDep, get_password_hash
 from app.models import UserBase, User, RandomItemBase, RandomItem, get_session
 
@@ -129,3 +130,22 @@ def client_fixture(session, user):
         stmt = delete(model)
         session.exec(stmt)
         session.commit()
+
+
+@pytest.fixture()
+def token(user, mock_cognito_client, mock_token, client, monkeypatch):
+    monkeypatch.setenv("AWS_REGION", mock_cognito_client.region)
+    monkeypatch.setenv("AWS_USER_POOL_ID", mock_cognito_client.user_pool_id)
+    monkeypatch.setenv("AWS_COGNITO_APP_CLIENT_ID", mock_cognito_client.client_id)
+    monkeypatch.setenv("AWS_COGNITO_APP_CLIENT_SECRET", mock_cognito_client.client_secret)
+
+    # Stub the cognito function to return the mock client
+    monkeypatch.setattr(app.dependencies, "get_aws_cognito", mock_cognito_client)
+    monkeypatch.setattr(AWSCognito, "decode_token", mock_token)
+
+    resp = client.post("/users/login", data={"username": "test_username", "password": "SecurePassword1234#$%"})
+    assert resp.status_code == 200
+    token = resp.json()['access_token']
+    assert token is not None
+
+    return token

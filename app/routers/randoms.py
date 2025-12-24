@@ -40,7 +40,7 @@ async def read_random(random_id: int, session: SessionDep, user: CurrentActiveUs
         .where(RandomItem.id == random_id)
     ).first()
     if not random_db:
-        raise HTTPException(status_code=404, detail="Random Item not found")
+        raise HTTPException(status_code=404, detail="Random item not found")
     return random_db
 
 
@@ -82,7 +82,6 @@ async def update_random(
         raise HTTPException(status_code=404, detail="Random item not found")
 
     random_data = random_item.model_dump(exclude_unset=True)
-    logger.info(f"DATA IN PATCH: {random_data}")
     random_db.sqlmodel_update(
         random_data,
         update={

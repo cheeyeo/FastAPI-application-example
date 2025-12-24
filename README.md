@@ -118,5 +118,5 @@ docker compose --env-file .env.test -f compose.test.yml up
 
 In another terminal:
 ```
-uv run -m pytest -p no:cacheprovider -s -v
+uv run -m pytest -p no:cacheprovider -s -v --cov-report=term --cov=app
 ```
