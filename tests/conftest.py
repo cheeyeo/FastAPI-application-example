@@ -10,8 +10,8 @@ from moto import mock_aws
 from dotenv import dotenv_values
 from app.core.application import create_app
 from app.core.aws_cognito import AWSCognito, UserSignup
-import app.dependencies
-from app.dependencies import CognitoDep, get_password_hash
+# import app.dependencies
+from app.dependencies import CognitoDep, get_password_hash, get_aws_cognito
 from app.models import UserBase, User, RandomItemBase, RandomItem, get_session
 
 
@@ -50,14 +50,6 @@ def mock_cognito_client(aws_credentials):
         )
         
         cognito_client.admin_confirm_sign_up(UserPoolId=user_pool_id, Username=username)
-
-        # access_token = cognito_client.initiate_auth(
-        #     ClientId=app_client["UserPoolClient"]["ClientId"],
-        #     AuthFlow="USER_PASSWORD_AUTH",
-        #     AuthParameters={"USERNAME": username, "PASSWORD": password},
-        # )["AuthenticationResult"]["AccessToken"]
-
-        # print(f"CONFTEST ACCESS TOKEN: {access_token}")
 
         yield AWSCognito(client=cognito_client, region="us-west-1", client_id=app_client["UserPoolClient"]["ClientId"], client_secret="SECRET", user_pool_id=user_pool_id)
 
@@ -113,13 +105,18 @@ def user_fixture(session):
 
 
 @pytest.fixture(name="client", scope="session")
-def client_fixture(session, user):
+def client_fixture(session, user, mock_cognito_client):
     # Overrides the database dependency to use the test session
     def get_session_override():
         return session
     
+    # Overrides the cognito client dependency to use the test client
+    def get_aws_cognito_override():
+        return mock_cognito_client
+
     app = create_app()
     app.dependency_overrides[get_session] = get_session_override
+    app.dependency_overrides[get_aws_cognito] = get_aws_cognito_override
 
     client = TestClient(app)
     yield client
@@ -139,8 +136,7 @@ def token(user, mock_cognito_client, mock_token, client, monkeypatch):
     monkeypatch.setenv("AWS_COGNITO_APP_CLIENT_ID", mock_cognito_client.client_id)
     monkeypatch.setenv("AWS_COGNITO_APP_CLIENT_SECRET", mock_cognito_client.client_secret)
 
-    # Stub the cognito function to return the mock client
-    monkeypatch.setattr(app.dependencies, "get_aws_cognito", mock_cognito_client)
+    # Stub the decode_token function to return a mock token with custom user scopes
     monkeypatch.setattr(AWSCognito, "decode_token", mock_token)
 
     resp = client.post("/users/login", data={"username": "test_username", "password": "SecurePassword1234#$%"})

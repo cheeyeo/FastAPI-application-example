@@ -7,3 +7,6 @@
 
 
 https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-define-resource-servers.html
+
+
+from moto import cognitoidp
