@@ -43,14 +43,6 @@ class TokenData(BaseModel):
     scopes: list[str] = []
 
 
-def get_user(username: str):
-    for session in get_session():
-        user = session.exec(select(User).where(User.username == username)).first()
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-        return user
-
-
 async def get_current_user_cognito(security_scopes: SecurityScopes, cognito: CognitoDep, token: TokenDep, session: SessionDep):
     if security_scopes.scopes:
         authenticate_value = f"Bearer scope={security_scopes.scope_str}"

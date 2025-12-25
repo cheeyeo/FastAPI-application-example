@@ -69,7 +69,7 @@ def mock_token():
             "iat": 1662022792,
             "jti": "d5d3f3d9-c02d-41e7-a9da-4443278d61cf",
             "username": "test_username",
-            "scope": "me randoms"
+            "scope": "me randoms aws.cognito.signin.user.admin"
         }
     
     return return_token

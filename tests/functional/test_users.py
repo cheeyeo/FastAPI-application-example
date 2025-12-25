@@ -124,3 +124,44 @@ def test_users_verify_code_internal_error(mocker, client, mock_cognito_client):
     assert resp.json() == {"detail": "Internal server error"}
 
 
+def test_users_logout_no_token(client):
+    resp = client.post("/users/logout")
+    assert resp.status_code == 401
+    assert resp.json() == {"detail": "Not authenticated"}
+
+
+def test_users_logout(client, token):
+    resp = client.post("/users/logout", headers={"Authorization": f"Bearer {token}"})
+    assert resp.status_code == 200
+    assert resp.json() == {"message": "Logged out successfully"}
+
+
+def test_users_logout_wrong_token_format(mocker, client, token, mock_cognito_client):
+    mocker.patch.object(mock_cognito_client, "logout", side_effect=ClientError(error_response={"Error": {"Code": "InvalidParameterException"}}, operation_name="global_sign_out"))
+
+    resp = client.post("/users/logout", headers={"Authorization": f"Bearer {token}"})
+    assert resp.status_code == 400
+    assert resp.json() == {"detail": "Access token provided has wrong format"}
+
+
+def test_users_logout_unauthorized(mocker, client, token, mock_cognito_client):
+    mocker.patch.object(mock_cognito_client, "logout", side_effect=ClientError(error_response={"Error": {"Code": "NotAuthorizedException"}}, operation_name="global_sign_out"))
+
+    resp = client.post("/users/logout", headers={"Authorization": f"Bearer {token}"})
+    assert resp.status_code == 401
+    assert resp.json() == {"detail": "Invalid access token provided"}
+
+
+def test_users_logout_rate_limit(mocker, client, token, mock_cognito_client):
+    mocker.patch.object(mock_cognito_client, "logout", side_effect=ClientError(error_response={"Error": {"Code": "TooManyRequestsException"}}, operation_name="global_sign_out"))
+
+    resp = client.post("/users/logout", headers={"Authorization": f"Bearer {token}"})
+    assert resp.status_code == 429
+    assert resp.json() == {"detail": "Too many requests"}
+
+def test_users_logout_internal_error(mocker, client, token, mock_cognito_client):
+    mocker.patch.object(mock_cognito_client, "logout", side_effect=ClientError(error_response={"Error": {"Code": "InternalErrorException"}}, operation_name="global_sign_out"))
+
+    resp = client.post("/users/logout", headers={"Authorization": f"Bearer {token}"})
+    assert resp.status_code == 500
+    assert resp.json() == {"detail": "Internal server error"}

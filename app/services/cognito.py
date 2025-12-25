@@ -55,6 +55,7 @@ class AuthService:
         try:
             cognito.logout(access_token)
         except ClientError as e:
+            logger.info(f"ERROR USER LOGOUT - {e}")
             if e.response["Error"]["Code"] == "InvalidParameterException":
                 raise HTTPException(
                     status_code=400, detail="Access token provided has wrong format"
@@ -66,7 +67,7 @@ class AuthService:
             elif e.response["Error"]["Code"] == "TooManyRequestsException":
                 raise HTTPException(status_code=429, detail="Too many requests")
             else:
-                raise HTTPException(status_code=500, detail="Internal Server")
+                raise HTTPException(status_code=500, detail="Internal server error")
         else:
             return JSONResponse(
                 content={"message": "Logged out successfully"}, status_code=200

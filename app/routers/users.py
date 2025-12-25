@@ -24,7 +24,7 @@ router = APIRouter()
 async def create_users(
     user: UserSignup,
     session: SessionDep,
-    cognito: AWSCognito = Depends(get_aws_cognito),
+    cognito: CognitoDep,
 ):
     resp = AuthService.user_signup(user, cognito)
     content = json.loads(resp.body.decode('utf-8'))
@@ -64,12 +64,12 @@ async def login(
 
 
 @router.post("/users/verify", tags=["Authentication"])
-async def verify(data: UserVerify, cognito: AWSCognito = Depends(get_aws_cognito)):
+async def verify(data: UserVerify, cognito: CognitoDep):
     return AuthService.verify_account(data, cognito)
 
 
 @router.post("/users/resend_confirmation_code", tags=["Authentication"])
-async def resend_code(username: str, cognito: AWSCognito = Depends(get_aws_cognito)):
+async def resend_code(username: str, cognito: CognitoDep):
     return AuthService.resend_confirmation(username, cognito)
 
 
@@ -78,11 +78,9 @@ async def read_users_me(current_user: CurrentActiveUser):
     return current_user
 
 
-# TODO: Using the Authorize form the authentication token is set in the header via Swagger UI
-# even if we call /users/logout, the auth token will still be in the headers; the only way to logout in the swagger UI is via the same authorize form > logout link
-@router.get("/users/logout", tags=["Authentication"])
+@router.post("/users/logout", tags=["Authentication"])
 async def logout(
     token: TokenDep,
-    cognito: AWSCognito = Depends(get_aws_cognito),
+    cognito: CognitoDep,
 ):
     return AuthService.logout(token, cognito)
