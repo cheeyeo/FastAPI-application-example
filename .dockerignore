@@ -1,5 +1,6 @@
 __pycache__
 .env
+.env.test
 .git
 .github
 .pytest_cache

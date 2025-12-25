@@ -27,7 +27,7 @@ def upgrade() -> None:
     sa.Column('email', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('full_name', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('password', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('sub', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('disabled', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )

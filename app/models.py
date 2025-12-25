@@ -28,17 +28,14 @@ class UserBase(SQLModel):
 
 class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    password: str
+    sub: str | None = None
     disabled: bool = False
     randomitems: list["RandomItem"] = Relationship(back_populates="user")
 
 
-class UserCreate(UserBase):
-    password: str
-
-
 class UserPublic(UserBase):
     id: int
+    sub: str
     disabled: bool
 
 

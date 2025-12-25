@@ -9,9 +9,9 @@ from sqlalchemy import delete
 from moto import mock_aws
 from dotenv import dotenv_values
 from app.core.application import create_app
-from app.core.aws_cognito import AWSCognito, UserSignup
+from app.core.aws_cognito import AWSCognito
 # import app.dependencies
-from app.dependencies import CognitoDep, get_password_hash, get_aws_cognito
+from app.dependencies import CognitoDep, get_aws_cognito
 from app.models import UserBase, User, RandomItemBase, RandomItem, get_session
 
 
@@ -97,7 +97,6 @@ def user_fixture(session):
     db_user = User(
         username="test_username",
         email="test_mail@test.com",
-        password=get_password_hash("SecurePassword1234#$%")
     )
     session.add(db_user)
     session.commit()

@@ -14,7 +14,7 @@ class AuthService:
         except ClientError as e:
             logger.info(f"ERROR FROM COGNNITO: {e}")
             if e.response["Error"]["Code"] == "UsernameExistsException":
-                raise HTTPException(status_code=409, detail="account with email exists")
+                raise HTTPException(status_code=409, detail="Account with email exists")
             else:
                 raise HTTPException(status_code=500, detail="Internal server error")
         else:
@@ -32,12 +32,12 @@ class AuthService:
         except ClientError as e:
             logger.info(f"ERROR USER SIGNIN - {e}")
             if e.response["Error"]["Code"] == "UserNotFoundException":
-                raise HTTPException(status_code=404, detail="user does not exist")
+                raise HTTPException(status_code=404, detail="User does not exist")
             elif e.response["Error"]["Code"] == "UserNotConfirmedException":
-                raise HTTPException(status_code=403, detail="verify your account")
+                raise HTTPException(status_code=403, detail="Verify your account")
             elif e.response["Error"]["Code"] == "NotAuthorizedException":
                 raise HTTPException(
-                    status_code=401, detail="incorrect username or password"
+                    status_code=401, detail="Incorrect username or password"
                 )
             else:
                 raise HTTPException(status_code=500, detail="Internal server error")
@@ -91,7 +91,7 @@ class AuthService:
             elif e.response["Error"]["Code"] == "NotAuthorizedException":
                 raise HTTPException(status_code=200, detail="User already verified.")
             else:
-                raise HTTPException(status_code=500, detail="Internal Server")
+                raise HTTPException(status_code=500, detail="Internal server error")
         else:
             return JSONResponse(
                 content={"message": "Account verification successful"}, status_code=200

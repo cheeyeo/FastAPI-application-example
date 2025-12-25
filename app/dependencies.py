@@ -6,7 +6,6 @@ import boto3
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from jwt.exceptions import InvalidTokenError
-from pwdlib import PasswordHash
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
@@ -18,14 +17,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# generate secret key using:
-# openssl rand -hex 32
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-
-password_hash = PasswordHash.recommended()
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/users/login", scopes={"me": "Information about user", "randoms": "Random numbers API"})
 SessionDep = Annotated[Session, Depends(get_session)]
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
@@ -50,14 +41,6 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: str | None = None
     scopes: list[str] = []
-
-
-def verify_password(plain_password, hashed_password):
-    return password_hash.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password):
-    return password_hash.hash(password)
 
 
 def get_user(username: str):
