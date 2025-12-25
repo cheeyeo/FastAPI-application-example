@@ -10,9 +10,9 @@ from app.dependencies import (
     SessionDep,
     Token,
     TokenDep,
+    CognitoDep,
     get_aws_cognito,
     logger,
-    CognitoDep,
 )
 from app.models import User, UserPublic
 from app.services.cognito import AuthService

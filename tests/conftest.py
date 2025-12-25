@@ -10,7 +10,6 @@ from moto import mock_aws
 from dotenv import dotenv_values
 from app.core.application import create_app
 from app.core.aws_cognito import AWSCognito
-# import app.dependencies
 from app.dependencies import CognitoDep, get_aws_cognito
 from app.models import UserBase, User, RandomItemBase, RandomItem, get_session
 

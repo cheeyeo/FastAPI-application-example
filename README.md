@@ -65,9 +65,9 @@ https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
 
 
 ### TUTORIAL
-- [ ] https://fastapi.tiangolo.com/tutorial/testing
+- [x] https://fastapi.tiangolo.com/tutorial/testing
 - [x] https://fastapi.tiangolo.com/tutorial/bigger-applications/
-- [ ] https://sqlmodel.tiangolo.com/tutorial/fastapi/
+- [x] https://sqlmodel.tiangolo.com/tutorial/fastapi/
 - [x] https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/
 - [x] https://fastapi.tiangolo.com/tutorial/security/first-steps/
 - [x] https://fastapi.tiangolo.com/tutorial/middleware/
