@@ -1,3 +1,5 @@
+import pytest
+from fastapi.exceptions import HTTPException
 from botocore.exceptions import ClientError
 from app.core.aws_cognito import AWSCognito
 
@@ -15,6 +17,12 @@ def test_users_signup(client):
     assert user["sub"] == sub
     assert user["username"] == "test"
     assert user["email"] == "test@example.com"
+
+
+def test_users_by_sub_not_found(client):
+    resp = client.get("/users/subnotfoud")
+    assert resp.status_code == 404
+    assert resp.json() == {"detail": "User not found"}
 
 
 def test_users_signup_user_exists(mocker, client, mock_cognito_client):
@@ -39,6 +47,8 @@ def test_users_login(client, mock_cognito_client):
     resp = client.post("/users/login", data={"username": "test_username", "password": "SecurePassword1234#$%"})
     assert resp.status_code == 200
     assert resp.json()["access_token"] is not None
+    assert resp.json()["refresh_token"] is not None
+    assert resp.json()["id_token"] is not None
     assert resp.json()["token_type"] == "bearer"
 
 
@@ -165,3 +175,17 @@ def test_users_logout_internal_error(mocker, client, token, mock_cognito_client)
     resp = client.post("/users/logout", headers={"Authorization": f"Bearer {token}"})
     assert resp.status_code == 500
     assert resp.json() == {"detail": "Internal server error"}
+
+
+def test_users_resend_confirmation_code(mocker, client, mock_cognito_client):
+    mocker.patch.object(mock_cognito_client, "resend_confirmation_code", return_value=True)
+
+    resp = client.post("/users/resend_confirmation_code", json={"username": "test_user"})
+    print(resp.json())
+    assert resp.status_code == 200
+    assert resp.json() == {"message": "Confirmation code sent successfully"}
+
+
+def test_users_get_current_user(client):
+    resp = client.get("/users/me")
+    print(resp.json())

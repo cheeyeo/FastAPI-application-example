@@ -44,6 +44,7 @@ class AuthService:
         else:
             content = {
                 "message": "User signed in successfully",
+                "IdToken": response["AuthenticationResult"]["IdToken"],
                 "AccessToken": response["AuthenticationResult"]["AccessToken"],
                 "RefreshToken": response["AuthenticationResult"]["RefreshToken"],
             }
@@ -108,7 +109,7 @@ class AuthService:
             elif e.response["Error"]["Code"] == "LimitExceededException":
                 raise HTTPException(status_code=429, detail="Limit exceeded")
             else:
-                raise HTTPException(status_code=500, detail="Internal Server")
+                raise HTTPException(status_code=500, detail="Internal server error")
         else:
             return JSONResponse(
                 content={"message": "Confirmation code sent successfully"},

@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Security, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import select
-from app.core.aws_cognito import AWSCognito, UserSignin, UserSignup, UserVerify
+from app.core.aws_cognito import AWSCognito, UserSignin, UserSignup, UserVerify, UserResendCode
 from app.dependencies import (
     CurrentActiveUser,
     SessionDep,
@@ -60,7 +60,7 @@ async def login(
         UserSignin(username=form_data.username, password=form_data.password), cognito
     )
     content = json.loads(resp.body.decode("utf-8"))
-    return Token(access_token=content.get("AccessToken"), token_type="bearer")
+    return Token(access_token=content.get("AccessToken"), refresh_token=content.get("RefreshToken"), id_token=content.get("IdToken"), token_type="bearer")
 
 
 @router.post("/users/verify", tags=["Authentication"])
@@ -69,8 +69,8 @@ async def verify(data: UserVerify, cognito: CognitoDep):
 
 
 @router.post("/users/resend_confirmation_code", tags=["Authentication"])
-async def resend_code(username: str, cognito: CognitoDep):
-    return AuthService.resend_confirmation(username, cognito)
+async def resend_code(data: UserResendCode, cognito: CognitoDep):
+    return AuthService.resend_confirmation(data, cognito)
 
 
 @router.get("/users/me", response_model=UserPublic, tags=["Authentication"])

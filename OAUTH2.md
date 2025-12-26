@@ -79,6 +79,8 @@ key roles in OAuth flow
 
 ### REFS:
 
+* https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-define-resource-servers.html
+
 * https://docs.aws.amazon.com/cognito/latest/developerguide/token-revocation.html
 
 * https://stackoverflow.com/questions/76867554/fastapi-how-to-access-bearer-token
@@ -87,11 +89,7 @@ key roles in OAuth flow
 
 * https://timothy.hashnode.dev/building-an-authentication-api-with-aws-cognito-and-fastapi#heading-b-creating-a-user-pool
 
-* https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/cognito#code-examples
-
 * https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html
-
-* https://github.com/Timothy-py/FastCognito/tree/main
 
 * https://gofastmcp.com/integrations/aws-cognito#step-2%3A-fastmcp-configuration
 
@@ -103,4 +101,10 @@ key roles in OAuth flow
 
 
 
-https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/python/example_code/cognito/cognito_idp_actions.py
+#### Code examples
+
+* https://github.com/Timothy-py/FastCognito/tree/main
+
+* https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/cognito#code-examples
+
+* https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/python/example_code/cognito/cognito_idp_actions.py

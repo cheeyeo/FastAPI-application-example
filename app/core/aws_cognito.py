@@ -31,6 +31,10 @@ class UserVerify(BaseModel):
     confirmation_code: str
 
 
+class UserResendCode(BaseModel):
+    username: str
+
+
 class AWSCognito:
     def __init__(self, client, region, client_id, client_secret, user_pool_id):
         self.client = client
@@ -79,20 +83,20 @@ class AWSCognito:
 
         return response
 
-    def resend_confirmation_code(self, username: str):
+    def resend_confirmation_code(self, data: UserResendCode):
         """Sends the confirmation code"""
 
         secret_hash = base64.b64encode(
             hmac.new(
                 bytes(self.client_secret, "utf-8"),
-                bytes(username + self.client_id, "utf-8"),
+                bytes(data.username + self.client_id, "utf-8"),
                 digestmod=hashlib.sha256,
             ).digest()
         ).decode()
 
         response = self.client.resend_confirmation_code(
             ClientId=self.client_id,
-            Username=username,
+            Username=data.username,
             SecretHash=secret_hash,
         )
 

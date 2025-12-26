@@ -4,6 +4,7 @@ This repo hosts a FastAPI application that generates random numbers between a mi
 
 It is also an experiment in using OAuth2 for API authentication and authorization via AWS Cognito.
 
+
 ### Run on localhost
 
 Create a AWS Cognito User Pool with an optional PreToken Generation Lambda trigger.

@@ -35,6 +35,8 @@ CognitoDep = Annotated[AWSCognito, Depends(get_aws_cognito)]
 
 class Token(BaseModel):
     access_token: str
+    refresh_token: str
+    id_token: str
     token_type: str
 
 
